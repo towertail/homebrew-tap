@@ -1,0 +1,50 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_ENV_HINTS: "1"
+
+jobs:
+  cask:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Tap this checkout
+        run: |
+          tap="$(brew --repository)/Library/Taps/towertail/homebrew-tap"
+          mkdir -p "$(dirname "$tap")"
+          rm -rf "$tap"
+          ln -s "$GITHUB_WORKSPACE" "$tap"
+
+      - name: Style
+        run: brew style towertail/tap
+
+      - name: Audit
+        run: brew audit --cask --strict --online towertail/tap/towertail
+
+      - name: Install
+        run: |
+          brew install --cask towertail/tap/towertail
+          want=$(brew info --cask --json=v2 towertail/tap/towertail | jq -r '.casks[0].version')
+          got=$(defaults read /Applications/Towertail.app/Contents/Info.plist CFBundleShortVersionString)
+          echo "cask $want, app $got"
+          test "$want" = "$got"
+          codesign --verify --deep --strict /Applications/Towertail.app
+          spctl --assess --type execute -vv /Applications/Towertail.app
+
+      - name: Uninstall with zap
+        run: |
+          brew uninstall --cask --zap towertail/tap/towertail
+          test ! -e /Applications/Towertail.app
