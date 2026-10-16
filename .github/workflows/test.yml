@@ -12,6 +12,8 @@ permissions:
 env:
   HOMEBREW_NO_AUTO_UPDATE: "1"
   HOMEBREW_NO_ENV_HINTS: "1"
+  # Online audit calls the GitHub API. Without a token, shared runners hit the rate limit.
+  HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
 
 jobs:
   cask:
