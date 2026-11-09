@@ -29,6 +29,8 @@ jobs:
           mkdir -p "$(dirname "$tap")"
           rm -rf "$tap"
           ln -s "$GITHUB_WORKSPACE" "$tap"
+          # Homebrew 7 does not load casks from an untrusted tap.
+          brew trust --tap towertail/tap
 
       - name: Style
         run: brew style towertail/tap
