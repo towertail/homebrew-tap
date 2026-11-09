@@ -1,6 +1,6 @@
 cask "towertail" do
-  version "0.3.4"
-  sha256 "afaffc5a52d49961ac719e050d186270b44dea4339a0f75fc33c26733a161794"
+  version "0.3.5"
+  sha256 "bdeb243fa4d0e69a97d105da86eefdd3ca916ba33cc065428fad74f9fb206a8e"
 
   url "https://github.com/towertail/towertail/releases/download/v#{version}/Towertail.zip"
   name "Towertail"
